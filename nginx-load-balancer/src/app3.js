@@ -5,7 +5,7 @@ const app = express();
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send(`Welcome to Instance ${process.env.INSTANCE_ID2}`);
+  res.send(`Welcome to Instance ${process.env.INSTANCE_ID3}`);
 });
 
 const PORT3 = process.env.PORT3 || 3002;
