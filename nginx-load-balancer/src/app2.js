@@ -8,7 +8,7 @@ app.get("/", (req, res) => {
   res.send(`Welcome to Instance ${process.env.INSTANCE_ID2}`);
 });
 
-const PORT = process.env.PORT2 || 3001;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+const PORT2 = process.env.PORT2 || 3001;
+app.listen(PORT2, () => {
+  console.log(`Server is running on port ${PORT2}`);
 });
