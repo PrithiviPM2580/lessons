@@ -1,10 +1,12 @@
 import express from "express";
-import route from "./routes/index.js";
 
 const app = express();
 
 app.use(express.json());
-app.use("/", route);
+
+app.get("/", (req, res) => {
+  res.send(`Welcome to Instance ${process.env.INSTANCE_ID1}`);
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

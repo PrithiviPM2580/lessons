@@ -1,5 +1,4 @@
 import { Router } from "express";
-console.log(process.env.INSTANCE_ID);
 
 const router = Router();
 
