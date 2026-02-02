@@ -300,4 +300,19 @@ async function postRange() {
   }
 }
 
-postRange();
+// postRange();
+
+async function findPostByUserId(userId) {
+  try {
+    const user = await Post.find(
+      { author: userId },
+      { author: 1, createdAt: 1, _id: 0 },
+    ).explain("executionStats");
+    console.log(user);
+    return user;
+  } catch (error) {
+    console.log("Error: ", error);
+  }
+}
+
+findPostByUserId("69806e3f52dfb849c5faea22");
