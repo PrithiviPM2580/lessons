@@ -6,3 +6,174 @@ import Post from "./model/post.js";
 import Comment from "./model/comment.js";
 
 connectDB();
+
+// Count posts per user (like dashboard stats)
+
+async function countPostsPerUser() {
+  try {
+    const stats = await Post.aggregate([
+      {
+        $group: {
+          _id: "$author",
+          totalPosts: { $sum: 1 },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $unwind: "$user",
+      },
+      {
+        $project: {
+          _id: 0,
+          userId: "$user._id",
+          fullName: { $concat: ["$user.firstName", " ", "$user.lastName"] },
+          email: "$user.email",
+          totalPosts: 1,
+        },
+      },
+      { $sort: { totalPosts: -1 } },
+    ]);
+    console.log(JSON.stringify(stats, null, 2));
+    return stats;
+  } catch (error) {
+    console.log("Error", error);
+  }
+}
+
+// countPostsPerUser();
+
+// Find top users by total post views
+
+async function userByTotalPostViews() {
+  try {
+    const stats = await Post.aggregate([
+      {
+        $group: {
+          _id: "$author",
+          totalPostViews: { $sum: "$views" },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $unwind: "$user",
+      },
+      {
+        $project: {
+          _id: 0,
+          userId: "$user._id",
+          fullName: { $concat: ["$user.firstName", " ", "$user.lastName"] },
+          email: "$user.email",
+          totalPostViews: 1,
+        },
+      },
+      {
+        $sort: { totalPostViews: -1 },
+      },
+    ]);
+    console.log(JSON.stringify(stats, null, 2));
+    return stats;
+  } catch (error) {
+    console.log("Error: ", error);
+  }
+}
+
+// userByTotalPostViews();
+
+// Find posts with most comments
+
+async function findPostWithMostComments() {
+  try {
+    const stats = await Comment.aggregate([
+      {
+        $group: {
+          _id: "$post",
+          mostComments: { $sum: 1 },
+        },
+      },
+      {
+        $lookup: {
+          from: "posts",
+          localField: "_id",
+          foreignField: "_id",
+          as: "post",
+        },
+      },
+      {
+        $unwind: "$post",
+      },
+      {
+        $project: {
+          _id: 0,
+          postId: "$post._id",
+          title: "$post.title",
+          mostComments: 1,
+        },
+      },
+      {
+        $sort: { mostComments: -1 },
+      },
+    ]);
+    console.log(JSON.stringify(stats, null, 2));
+    return stats;
+  } catch (error) {
+    console.log("Error: ", error);
+  }
+}
+
+// findPostWithMostComments();
+
+// List users with all their posts and comments (join collections)
+
+async function listUserPostsAndComments() {
+  try {
+    const stats = await User.aggregate([
+      {
+        $lookup: {
+          from: "posts",
+          localField: "_id",
+          foreignField: "author",
+          as: "posts",
+        },
+      },
+      {
+        $unwind: "$posts",
+      },
+      {
+        $lookup: {
+          from: "comments",
+          localField: "posts._id",
+          foreignField: "post",
+          as: "posts.comment",
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          firstName: { $first: "$firstName" },
+          email: { $first: "$email" },
+          posts: { $push: "$posts" },
+        },
+      },
+    ]);
+    console.log(JSON.stringify(stats, null, 2));
+    return stats;
+  } catch (error) {
+    console.log("Error: ", error);
+  }
+}
+
+listUserPostsAndComments();
