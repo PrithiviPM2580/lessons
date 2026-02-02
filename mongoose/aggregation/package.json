@@ -1,0 +1,19 @@
+{
+  "name": "aggregation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/queries.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/queries.js",
+    "seeder": "node src/seeders/seed.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.26.2",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "mongoose": "^9.1.5"
+  }
+}
