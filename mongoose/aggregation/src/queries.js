@@ -176,4 +176,76 @@ async function listUserPostsAndComments() {
   }
 }
 
-listUserPostsAndComments();
+// listUserPostsAndComments();
+
+// Aggregate tags popularity across posts
+
+async function aggregateTagsPost() {
+  try {
+    const stats = await Post.aggregate([
+      {
+        $unwind: "$tags",
+      },
+      {
+        $group: {
+          _id: "$tags",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { count: -1 },
+      },
+    ]);
+    console.log(JSON.stringify(stats, null, 2));
+    return stats;
+  } catch (error) {
+    console.log("Error: ", error);
+  }
+}
+
+// aggregateTagsPost();
+
+// Average comments per post per user lets practice this first
+
+async function averageCommentPerPostPerUser() {
+  try {
+    const stats = await Comment.aggregate([
+      {
+        $group: {
+          _id: "$post",
+          totalComments: { $sum: 1 },
+        },
+      },
+      {
+        $lookup: {
+          from: "posts",
+          localField: "_id",
+          foreignField: "_id",
+          as: "postInfo",
+        },
+      },
+      {
+        $unwind: "$postInfo",
+      },
+      {
+        $group: {
+          _id: "$postInfo.author",
+          totalComments: { $sum: "$totalComments" },
+          totalPosts: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          averageComments: { $divide: ["$totalComments", "$totalPosts"] },
+        },
+      },
+    ]);
+    console.log(JSON.stringify(stats, null, 2));
+    return stats;
+  } catch (error) {
+    console.log("Error: ", error);
+  }
+}
+
+averageCommentPerPostPerUser();
