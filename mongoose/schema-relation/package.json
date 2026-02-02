@@ -5,7 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "node --watch src/index.js"
+    "dev": "node --watch src/index.js",
+    "seeder": "node src/seeders/seed.js",
+    "query": " node src/queries.js"
   },
   "keywords": [],
   "author": "",
