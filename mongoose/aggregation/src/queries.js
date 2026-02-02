@@ -248,4 +248,56 @@ async function averageCommentPerPostPerUser() {
   }
 }
 
-averageCommentPerPostPerUser();
+// averageCommentPerPostPerUser();
+
+// Total posts, Most popular tags, Average comments per post
+
+async function toFindTotalPostsPopularTagsAverageCommentsPerPost() {
+  try {
+    const stats = await Post.aggregate([
+      {
+        $facet: {
+          totalPost: [{ $count: "count" }],
+          tags: [
+            {
+              $unwind: "$tags",
+            },
+            { $group: { _id: "$tags", count: { $sum: 1 } } },
+            { $sort: { count: -1 } },
+          ],
+          avgViews: [{ $group: { _id: null, avgViews: { $avg: "$views" } } }],
+        },
+      },
+    ]);
+    console.log(JSON.stringify(stats, null, 2));
+    return stats;
+  } catch (error) {
+    console.log("Error: ", error);
+  }
+}
+
+// toFindTotalPostsPopularTagsAverageCommentsPerPost();
+
+async function postRange() {
+  try {
+    const stats = await Post.aggregate([
+      {
+        $bucket: {
+          groupBy: "$views",
+          boundaries: [0, 10, 50, 100, 500],
+          default: "Other",
+          output: {
+            count: { $sum: 1 },
+            posts: { $push: "$title" },
+          },
+        },
+      },
+    ]);
+    console.log(JSON.stringify(stats, null, 2));
+    return stats;
+  } catch (error) {
+    console.log("Error: ", error);
+  }
+}
+
+postRange();
