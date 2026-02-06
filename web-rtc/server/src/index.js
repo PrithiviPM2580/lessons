@@ -1,7 +1,9 @@
 import express from "express";
 import { Server } from "socket.io";
 
-const io = new Server();
+const io = new Server({
+  cors: true,
+});
 const app = express();
 
 app.use(express.json());
@@ -10,11 +12,13 @@ app.use(express.urlencoded({ extended: true }));
 const emailToSocketMap = new Map();
 
 io.on("connection", (socket) => {
+  console.log("A user connected");
   socket.on("join-room", (data) => {
     console.log(`User with ${data.emailId} joined room ${data.roomId}`);
     const { roomId, emailId } = data;
     emailToSocketMap.set(emailId, socket.id);
     socket.join(roomId);
+    socket.emit("joined-room", { roomId });
     socket.broadcast.to(roomId).emit("user-joined", { emailId });
   });
 });
