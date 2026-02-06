@@ -7,7 +7,17 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-io.on("connection", (socket) => {});
+const emailToSocketMap = new Map();
+
+io.on("connection", (socket) => {
+  socket.on("join-room", (data) => {
+    console.log(`User with ${data.emailId} joined room ${data.roomId}`);
+    const { roomId, emailId } = data;
+    emailToSocketMap.set(emailId, socket.id);
+    socket.join(roomId);
+    socket.broadcast.to(roomId).emit("user-joined", { emailId });
+  });
+});
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
